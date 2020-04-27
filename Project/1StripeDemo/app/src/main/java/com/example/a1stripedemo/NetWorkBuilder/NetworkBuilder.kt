@@ -2,7 +2,6 @@ package com.bacl.solution.data
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.bacl.solution.utils.AppConstant
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.reactivex.schedulers.Schedulers
@@ -52,19 +51,16 @@ class NetworkBuilder private constructor() {
         fun provideGson(): Gson {
             return GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
         }
-
     }
 
     init {
         val retrofit = Retrofit.Builder()
-                .baseUrl(AppConstant.DOMAIN_HEADER)
-                .addConverterFactory(GsonConverterFactory.create(provideGson()))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-                .client(provideOkHttpClientGlobal())
-                .build()
+            .baseUrl("https://sshhhh.herokuapp.com/api/v1/")
+            .addConverterFactory(GsonConverterFactory.create(provideGson()))
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+            .client(provideOkHttpClientGlobal())
+            .build()
         appApi = retrofit.create(AppApi::class.java)
 
     }
-
-
 }

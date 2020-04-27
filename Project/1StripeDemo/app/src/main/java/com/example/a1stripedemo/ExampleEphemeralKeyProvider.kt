@@ -1,35 +1,43 @@
 package com.example.a1stripedemo
 
-import androidx.annotation.Size
+import com.bacl.solution.data.NetworkBuilder
+import com.example.a1stripedemo.Model.StripeRequest
+import com.example.a1stripedemo.Model.StripeResponse
+import com.example.a1stripedemo.NetWorkBuilder.NetWorkRequest
 import com.stripe.android.EphemeralKeyProvider
 import com.stripe.android.EphemeralKeyUpdateListener
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import java.io.IOException
+import retrofit2.Response
 
 class ExampleEphemeralKeyProvider : EphemeralKeyProvider {
-
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-
+    companion object{
+        private var instance: ExampleEphemeralKeyProvider = ExampleEphemeralKeyProvider()
+        val shared: ExampleEphemeralKeyProvider
+            get() {
+                return instance
+            }
+    }
     override fun createEphemeralKey(
-        @Size(min = 4) apiVersion: String,
+        apiVersion: String,
         keyUpdateListener: EphemeralKeyUpdateListener
     ) {
-        compositeDisposable.add(
-            backendApi.createEphemeralKey(hashMapOf("api_version" to apiVersion))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { responseBody ->
-                    try {
-                        val ephemeralKeyJson = responseBody.string()
-                        keyUpdateListener.onKeyUpdate(ephemeralKeyJson)
-                    } catch (e: IOException) {
-                        keyUpdateListener
-                            .onKeyUpdateFailure(0, e.message ?: "")
-                    }
-                })
+        val header = HashMap<String, String>()
+        header["Authorization"] = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxMywiZXhwIjoxNjE4NzU5OTk2fQ.Z8wzF8U5p4omSHqJzgfm2nvBMYU7g1zRshJ8bZt25rA"
+        NetWorkRequest.shared.doNetworkRequest(NetworkBuilder.api().createEphemeralKeys(header,
+            StripeRequest(apiVersion)
+        ), object :
+            NetWorkRequest.OnNetworkRequest<Response<StripeResponse>?> {
+            override fun onNetworkRequestError(throwable: Throwable?) {
+                println("fetch error: ${throwable?.localizedMessage}")
+            }
+            override fun onNetworkRequestSuccess(response: Response<StripeResponse>?) {
+                if (response!!.isSuccessful){
+                    println("response data: ${response.body()}")
+                    println( "createEphemeralKey success")
+                }else{
+                    println("createEphemeralKey fail ${response.message()}")
+                }
+            }
+        })
     }
-
 
 }

@@ -1,4 +1,4 @@
-package com.example.a1stripedemo
+package com.example.a1stripedemo.App
 
 import android.app.Application
 import com.stripe.android.PaymentConfiguration
