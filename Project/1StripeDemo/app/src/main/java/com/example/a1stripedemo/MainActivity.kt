@@ -14,8 +14,6 @@ class MainActivity : AppCompatActivity() {
     var selectPaymentMethodButton: Button? = null
     var payButton: Button? = null
     private lateinit var paymentSession: PaymentSession
-    private val defaultShippingInfo: ShippingInformation
-        get() = ShippingInformation()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

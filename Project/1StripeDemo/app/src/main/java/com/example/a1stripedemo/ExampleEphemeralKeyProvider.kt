@@ -5,6 +5,7 @@ import com.bacl.solution.data.NetworkBuilder
 import com.example.a1stripedemo.Model.StripeRequest
 import com.example.a1stripedemo.Model.StripeResponse
 import com.example.a1stripedemo.NetWorkBuilder.NetWorkRequest
+import com.google.gson.Gson
 import com.stripe.android.EphemeralKeyProvider
 import com.stripe.android.EphemeralKeyUpdateListener
 import retrofit2.Response
@@ -35,9 +36,8 @@ class ExampleEphemeralKeyProvider : EphemeralKeyProvider {
             override fun onNetworkRequestSuccess(response: Response<StripeResponse>?) {
                 if (response!!.isSuccessful){
                     try {
-                        println("con cac")
-                        println(response.body().toString())
-                        val ephemeralKeyJson = response.body().toString()
+                        println(Gson().toJson(response.body()))
+                        val ephemeralKeyJson = Gson().toJson(response.body())
                         keyUpdateListener.onKeyUpdate(ephemeralKeyJson)
                     } catch (e: IOException) {
                         keyUpdateListener
