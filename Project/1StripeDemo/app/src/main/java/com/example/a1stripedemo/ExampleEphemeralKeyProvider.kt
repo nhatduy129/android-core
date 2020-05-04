@@ -1,5 +1,6 @@
 package com.example.a1stripedemo
 
+import androidx.annotation.Size
 import com.bacl.solution.data.NetworkBuilder
 import com.example.a1stripedemo.Model.StripeRequest
 import com.example.a1stripedemo.Model.StripeResponse
@@ -7,6 +8,7 @@ import com.example.a1stripedemo.NetWorkBuilder.NetWorkRequest
 import com.stripe.android.EphemeralKeyProvider
 import com.stripe.android.EphemeralKeyUpdateListener
 import retrofit2.Response
+import java.io.IOException
 
 class ExampleEphemeralKeyProvider : EphemeralKeyProvider {
     companion object{
@@ -17,11 +19,12 @@ class ExampleEphemeralKeyProvider : EphemeralKeyProvider {
             }
     }
     override fun createEphemeralKey(
-        apiVersion: String,
+        @Size(min = 4) apiVersion: String,
         keyUpdateListener: EphemeralKeyUpdateListener
     ) {
+        println(apiVersion)
         val header = HashMap<String, String>()
-        header["Authorization"] = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxMywiZXhwIjoxNjE4NzU5OTk2fQ.Z8wzF8U5p4omSHqJzgfm2nvBMYU7g1zRshJ8bZt25rA"
+        header["Authorization"] = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxMiwiZXhwIjoxNjE5MzUyOTgxfQ.Yg_G86kKq_1PHb0WMJLpnqcR8PxvYPgSYN35a5CbYIQ"
         NetWorkRequest.shared.doNetworkRequest(NetworkBuilder.api().createEphemeralKeys(header,
             StripeRequest(apiVersion)
         ), object :
@@ -31,8 +34,15 @@ class ExampleEphemeralKeyProvider : EphemeralKeyProvider {
             }
             override fun onNetworkRequestSuccess(response: Response<StripeResponse>?) {
                 if (response!!.isSuccessful){
-                    println("response data: ${response.body()}")
-                    println( "createEphemeralKey success")
+                    try {
+                        println("con cac")
+                        println(response.body().toString())
+                        val ephemeralKeyJson = response.body().toString()
+                        keyUpdateListener.onKeyUpdate(ephemeralKeyJson)
+                    } catch (e: IOException) {
+                        keyUpdateListener
+                            .onKeyUpdateFailure(0, e.message ?: "")
+                    }
                 }else{
                     println("createEphemeralKey fail ${response.message()}")
                 }
